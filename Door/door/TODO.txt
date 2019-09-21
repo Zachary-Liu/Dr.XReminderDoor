@@ -1,0 +1,10 @@
+TO-DO:
+-Linked List for _Objects
+-Check scan function
+    -scan the list and return which item was scanned
+-Add a new item to list
+    -read a card
+    -add RFID card ID to object
+-Unlock/Lock door
+-Update Webserver
+-Request Camera from jetson
