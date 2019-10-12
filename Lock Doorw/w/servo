@@ -1,0 +1,76 @@
+/*
+PINOUT:
+RC522 MODULE    Uno/Nano     MEGA
+SDA             D10          D9
+SCK             D13          D52
+MOSI            D11          D51
+MISO            D12          D50
+IRQ             N/A          N/A
+GND             GND          GND
+RST             D9           D8
+3.3V            3.3V         3.3V
+*/
+/* Include the standard Arduino SPI library */
+#include <SPI.h>
+#include<Servo.h>
+/* Include the RFID library */
+#include <RFID.h>
+
+/* Define the DIO used for the SDA (SS) and RST (reset) pins. */
+#define SDA_DIO 9
+#define RESET_DIO 8
+/* Create an instance of the RFID library */
+RFID RC522(SDA_DIO, RESET_DIO); 
+Servo servo;
+void setup()
+{ 
+  Serial.begin(9600);
+  /* Enable the SPI interface */
+  SPI.begin(); 
+  /* Initialise the RFID reader */
+  RC522.init();
+  pinMode(48,OUTPUT);
+  pinMode(53,OUTPUT);
+  servo.attach(10);
+}
+
+void loop()
+{
+  /* Has a card been detected? */
+  String objectlist[]= {"4861425120","22214042213173","927125128252","6910523479137"};
+  String card ="";
+  if (RC522.isCard())
+  {
+    /* If so then get its serial number */
+    RC522.readCardSerial();
+    Serial.println("Card detected:");
+    bool check = false;
+    for(int i=0;i<5;i++)
+    {
+      card+=RC522.serNum[i];
+    }
+    Serial.println(card);
+    Serial.println();
+    for (int i =0;i <sizeof(objectlist)/sizeof(objectlist[0]);i++){
+    if(card==objectlist[i]){
+      Serial.print("I'm In");
+      check = true;
+      //digitalWrite(48,HIGH);
+    }
+    
+    }
+    if(check){
+      digitalWrite(48,HIGH);
+      servo.write(180);
+    }
+    else{
+      digitalWrite(53,HIGH);
+      servo.write(0);
+    }
+    Serial.println();
+    
+  }
+  delay(1000);
+  digitalWrite(48,LOW);
+  digitalWrite(53,LOW);
+}
