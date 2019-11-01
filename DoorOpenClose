@@ -7,9 +7,10 @@ MOSI            D11          D51
 MISO            D12          D50
 IRQ             N/A          N/A
 GND             GND          GND
-RST             D9           D8
+RST             D9           D30
 3.3V            3.3V         3.3V
 */
+
 /* Include the standard Arduino SPI library */
 #include <SPI.h>
 #include<Servo.h>
@@ -29,8 +30,6 @@ void setup()
   SPI.begin(); 
   /* Initialise the RFID reader */
   RC522.init();
-  pinMode(48,OUTPUT);
-  pinMode(53,OUTPUT);
   servo.attach(7);
 }
 
@@ -39,7 +38,9 @@ void loop()
   /* Has a card been detected? */
   String objectlist[]= {"4861425120","22214042213173","927125128252","6910523479137"};
   String card ="";
+  RC522.readCardSerial();
   if (RC522.isCard())
+  
   {
     /* If so then get its serial number */
     RC522.readCardSerial();
@@ -55,17 +56,15 @@ void loop()
     if(card==objectlist[i]){
       Serial.print("I'm In");
       check = true;
-      //digitalWrite(48,HIGH);
     }
     
     }
     if(check){
-      digitalWrite(48,HIGH);
       servo.write(180); 
-      delay (1000);
+      delay (5000);
+      servo.write(0);
     }
     else{
-      digitalWrite(53,HIGH);
       servo.write(0);
     }
     Serial.println();
@@ -74,7 +73,5 @@ void loop()
   delay(5000);
   servo.write(0);
 }
-void func(String doorpenlist[]){
 
-}
 
