@@ -58,14 +58,25 @@ for (int i = 0; i<numberofkeys; i++){
     {
       card+=RC522.serNum[i];
     }
+    
   if (card ==(myDictionaryPt+i)->serial_number){
-    card == "";
+    Serial.println("2");
+    String newcard = "";
+    newcard = RC522.readCardSerial();
+    Serial.println(card.equals(newcard));
     numberofkeys ++;
+    Serial.println("a");
     if (numloop2==0){
+    
+    while (newcard.equals(card));
     Serial.println("Please Scan the Card You Want to Add");
+    RC522.readCardSerial();
     numloop2++;
+    Serial.println("3");
     }
     RC522.readCardSerial();
+    Serial.println(card);
+    Serial.println("4");
     for(int i=0;i<5;i++)
     {
       card+=RC522.serNum[i];
@@ -79,3 +90,4 @@ for (int i = 0; i<numberofkeys; i++){
   }
   
 }}
+
