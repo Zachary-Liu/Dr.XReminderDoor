@@ -14,6 +14,7 @@ RST             D9           D8
 /* Include the standard Arduino SPI library */
 #include <SPI.h>
 #include<Servo.h>
+#include <math.h>  
 /* Include the RFID library */
 #include <RFID.h>
 
@@ -24,15 +25,16 @@ RST             D9           D8
 /* Create an instance of the RFID library */
 RFID RC522(SDA_DIO, RESET_DIO); 
 Servo servo;
-typedef struct { 
-  char* Name = (char*)malloc(sizeof(char) * 25);
-  char* serial_number = (char*)malloc(sizeof(char) * 5);
-} cardDictionary;
-cardDictionary myDictionary[10];
-cardDictionary* myDictionaryPt = &myDictionary[0];
-int numberofkeys = 1;
-int numloop2 = 0;
 
+
+typedef struct{
+    char serial_num [5];
+    char name[20];
+ }card;
+
+ card sn;
+ card cards[20];
+ int index = 0;
 void setup()
 { 
   Serial.begin(9600);
@@ -41,70 +43,81 @@ void setup()
   /* Initialise the RFID reader */
   RC522.init();
   RC522.antennaOn();
-Serial.println("Please Scan a Registered KeyCard");
-  servo.attach(7);
-  myDictionaryPt->Name = "key 1";
-  myDictionaryPt->serial_number="4861425120";
-Serial.println(myDictionaryPt->Name);
+  int index = 0;
+  Serial.println("debuga");
+
+  Serial.println("Please Scan a Registered Card");
+}
+
+boolean registeredcard(char* temp){
+    if (index == 0){
+      return true;
+    }
+    
+    else if ( index > 0){
+      for (int i =0; i<index; i++){
+        for (int j = 0; j<5;j++){
+          if ((((cards[i]).serial_num[j]) == temp[j])!=true){
+            return false;
+            break;
+          }
+          else{
+            return true;
+          }
+          
+      }
+    }
+  }
 }
 
 void loop()
 {
 //if keycheck = true
-if (RC522.isCard()){
-  Serial.println("tp2");
-  if(RC522.readCardSerial()){
-    Serial.println("tp3");
-    boolean isregistered = true;
-    char * temp2 = (char)malloc(sizeof(char)*5);
-    temp2 = 0;
-    long temp3 = 0;
-    for(int i  = 0; i < 5; i++){
-      temp3 += 
-      Serial.print("Actual: ");
-      Serial.println(RC522.serNum[i]);
-      temp3 = (RC522.serNum[i]);
-      Serial.print("Temp 3: ");
-      Serial.println(temp3);
-    }
-    Serial.println("tp4");
-    Serial.println(temp3);
-    delay(1000);
-   
+
+  if (RC522.isCard()){
+    if(RC522.readCardSerial()){
+      //strcpy(sn.name, "card 1");//
+      String check ="";
+      for(int i = 0; i < 5; i++){ 
+          sn.serial_num[i] = (char)(RC522.serNum[i]);
+          Serial.println(sn.serial_num[i]);
+          check+= sn.serial_num[i];
+      }
+      if (registeredcard(sn.serial_num)){
+        Serial.println("True");
+      }
+      else{
+        Serial.println("False");
+      }
+      /*
+      if ((registeredcard(check))=true){
+        String temp = "";
+        RC522.readCardSerial()
+      for(int j = 0; j < 5; j++){ 
+          sn.serial_num[j] = (char)(RC522.serNum[i]);
+          Serial.println(sn[index].serial_num[i]);
+          temp+= sn.serial_num[j];
+      }
+      
+      Serial.println(temp);
+      }
+      }
+      
+
+      for (int k =0; k<5;k++){
+        EEPROM.write(index*5 + i, cards[index].serial_num[i]);
+      }
+      delay (1500);
   
+     }
+      */
+  }
   
- /* if (card == (myDictionaryPt+i)->serial_number){
-    Serial.println("2");
-    char* newcard = (char*)malloc(sizeof(char)*15);
-    newcard = (char*)RC522.readCardSerial();
-    Serial.println(strcmp(card, newcard));
-    numberofkeys ++;
-    Serial.println("a");
-    if (numloop2==0){
-    
-    while (strcmp(card, newcard));
-    Serial.println("Please Scan the Card You Want to Add");
-    RC522.readCardSerial();
-    numloop2++;
-    Serial.println("3");
-    }
-    RC522.readCardSerial();
-    Serial.println(card);
-    Serial.println("4");
-    for(int i=0;i<5;i++)
-    {
-      card+=RC522.serNum[i];
-    }
-    myDictionaryPt->serial_number = card;
-    //enter the name of new key, "x"
-    //(myDictionary + numberofkeys)->NAME=x;
-    
+ 
   }
 
-  */
-  }
-  
-  }
-  
 }
+  
+
+
 
