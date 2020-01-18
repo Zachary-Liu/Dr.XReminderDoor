@@ -44,30 +44,42 @@ void setup()
   RC522.init();
   RC522.antennaOn();
   int index = 0;
-  Serial.println("debuga");
 
   Serial.println("Please Scan a Registered Card");
 }
-
+// returns true to signal that the card is unregistered
+// returns false to signal that the card is registered
 boolean registeredcard(char* temp){
     if (index == 0){
       return true;
     }
+    boolean res = false;
     
-    else if ( index > 0){
-      for (int i =0; i<index; i++){
+    if ( index > 0){
+      int truecounter = 0;
+      for (int i =0; i<=index - 1; i++){
         for (int j = 0; j<5;j++){
-          if ((((cards[i]).serial_num[j]) == temp[j])!=true){
-            return false;
-            break;
-          }
-          else{
-            return true;
-          }
+          /*
+          Serial.print("Read");
+          Serial.print(temp[j]);
+          Serial.print("cards");
+          Serial.println(cards[i].serial_num[j]);*/
+          if (!(cards[i].serial_num[j] == temp[j])){
+              truecounter++;
+              j = 6;  //break;
+              
+            }
+           
+        }
           
       }
+      if (truecounter == index){
+        res = true;
+        //Serial.print("truecounter = ");
+        //Serial.println(truecounter);
+      }
     }
-  }
+   return res;
 }
 
 void loop()
@@ -75,49 +87,44 @@ void loop()
 //if keycheck = true
 
   if (RC522.isCard()){
+   
     if(RC522.readCardSerial()){
       //strcpy(sn.name, "card 1");//
       String check ="";
       for(int i = 0; i < 5; i++){ 
           sn.serial_num[i] = (char)(RC522.serNum[i]);
-          Serial.println(sn.serial_num[i]);
+          
+         //Serial.println(sn.serial_num[i]);
           check+= sn.serial_num[i];
+         
       }
       if (registeredcard(sn.serial_num)){
-        Serial.println("True");
-      }
-      else{
-        Serial.println("False");
-      }
-      /*
-      if ((registeredcard(check))=true){
-        String temp = "";
-        RC522.readCardSerial()
-      for(int j = 0; j < 5; j++){ 
-          sn.serial_num[j] = (char)(RC522.serNum[i]);
-          Serial.println(sn[index].serial_num[i]);
-          temp+= sn.serial_num[j];
-      }
+        
+        Serial.println("Card has just been Registered");
+        for(int i = 0; i < 5; i++){
+          cards[index].serial_num[i] = sn.serial_num[i];
+          
+        }
+        index++;
       
-      Serial.println(temp);
-      }
-      }
-      
-
-      for (int k =0; k<5;k++){
-        EEPROM.write(index*5 + i, cards[index].serial_num[i]);
-      }
-      delay (1500);
-  
      }
-      */
+     else{
+        Serial.println("Card has Already Been Registered");
+    
+    }
+      
+   }   
+ }
+
   }
+ }
+} 
+ 
+      
+ 
   
  
-  }
-
-}
   
 
 
-
+  
